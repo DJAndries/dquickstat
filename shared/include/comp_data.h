@@ -15,7 +15,10 @@
 #define ID_TOTALSWAP 10
 #define ID_USEDSWAP 11
 
-#define TOTAL_NUMS 12
+#define ID_CPUTEMP 12
+#define ID_GPUTEMP 13
+
+#define TOTAL_NUMS 14
 #include <stdint.h>
 
 struct comp_data {
