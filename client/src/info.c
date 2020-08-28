@@ -13,6 +13,7 @@ void init_info() {
 int query_cpu(comp_data* data) {
 	size_t i;
 	char temp[1024];
+	char item[64];
 	unsigned long long a, b, c, used, idle;
 	double interval_total, interval_used;
 
@@ -27,14 +28,15 @@ int query_cpu(comp_data* data) {
 	fgets(temp, 1024, stat_file);
 
 	for (i = 0; i < 8; i++) {
-		if (fscanf(stat_file, "%s %llu %llu %llu %llu",
-					temp, &a, &b, &c, &idle) != 5) {
+		fgets(temp, 1024, stat_file);
+		if (sscanf(temp, "%s %llu %llu %llu %llu",
+					item, &a, &b, &c, &idle) != 5) {
 			dlog(LOG_ERROR, "Failed to read line in /proc/stat file");
 			fclose(stat_file);
 			return 2;
 		}
 
-		if (memcmp(temp, "cpu", 3) != 0) {
+		if (memcmp(item, "cpu", 3) != 0) {
 			break;
 		}
 
