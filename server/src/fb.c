@@ -24,7 +24,7 @@ int init_fb(const char* device) {
 	}
 
 	sprintf(filename, "%s%s", res_prefix, "bg.bmp");
-	if ((bg = fbmagic_load_bmp(filename)) == 0) {
+	if ((bg = fbmagic_load_bmp(fb_ctx, filename)) == 0) {
 		fbmagic_exit(fb_ctx);
 		return 2;
 	}
@@ -122,7 +122,7 @@ void draw_frame(comp_data* data) {
 	size_t x, y;
 	uint32_t main_color = fbmagic_color_value(fb_ctx, 0x0, 0x02, 0x59);
 	uint32_t disabled_color = fbmagic_color_value(fb_ctx, 0x90, 0x90, 0x90);
-	fbmagic_draw_image(fb_ctx, 0, 0, bg, 1.0f);
+	fbmagic_draw_image_quick(fb_ctx, 0, 0, bg);
 
 	x = 20;
 	y = 20;

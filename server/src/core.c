@@ -31,7 +31,7 @@ int main(int argc, const char** argv) {
 				switch_backlight("0");
 		}
 
-		usleep(1000 * 1000);
+		usleep(950 * 1000);
 	}
 
 	free_fb();
