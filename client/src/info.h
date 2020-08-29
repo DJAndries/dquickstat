@@ -9,4 +9,6 @@ int query_cpu(comp_data* data);
 
 int query_mem(comp_data* data);
 
+int query_thermal(comp_data* data);
+
 #endif
