@@ -54,27 +54,30 @@ int net_get_data(comp_data* in_data) {
 	struct sockaddr_in caddr;
 	size_t sin_size = sizeof(struct sockaddr_in);
 	size_t bytes_read;
+	int result = -2;
 	comp_data temp;
 
 	if (curr_cli_fd == -1) {
 		if ((curr_cli_fd = accept(server_fd, (struct sockaddr*)&caddr,
 				&sin_size)) == -1) {
-			return 1;
+			return -1;
 		}
 		fcntl(curr_cli_fd, F_SETFL, O_NONBLOCK);
 		dlog(LOG_DEBUG, "Accepted connection");
+		result = NET_NEW_CONN;
 	}
 
 	while ((bytes_read = recv(curr_cli_fd, &temp, sizeof(comp_data), MSG_PEEK)) == sizeof(comp_data)) {
 		recv(curr_cli_fd, in_data, sizeof(comp_data), 0);
+		result = NET_MSG;
 	}
 
 	if (send(curr_cli_fd, "k", 1, MSG_NOSIGNAL) != 1) {
 		dlog(LOG_DEBUG, "Closed connection");
 		close(curr_cli_fd);
 		curr_cli_fd = -1;
-		return 2;
+		return NET_CONN_CLOSE;
 	}
 
-	return 0;
+	return result;
 }
