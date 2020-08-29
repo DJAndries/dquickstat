@@ -5,6 +5,8 @@
 
 #define MB_BYTES 1048576
 
+#define TEXT_SCALE 1.6f
+
 static fbmagic_ctx* fb_ctx;
 static fbmagic_image* bg;
 static fbmagic_font* font;
@@ -55,7 +57,7 @@ static size_t draw_cpu(comp_data* data, size_t x, size_t y, uint32_t main_color,
 		x = (i % 2 == 0) ? 20 : 165;
 		sprintf(label, "CPU %u:", i);
 		fbmagic_draw_text(fb_ctx, font, x, y, label,
-				val == 0 ? disabled_color : main_color, 1.5f);
+				val == 0 ? disabled_color : main_color, TEXT_SCALE);
 		fbmagic_stroke(fb_ctx, x + 55, y + 3, 80, 7, 1,
 				val == 0 ? disabled_color : main_color);
 		fbmagic_fill(fb_ctx, x + 55, y + 3, val, 7, main_color);
@@ -80,7 +82,7 @@ static size_t draw_memory(comp_data* data, size_t x, size_t y, uint32_t main_col
 
 	val = total_mem_mb == 0 ? 0 : (size_t)(((float)used_mem_mb / total_mem_mb) * 280);
 	fbmagic_draw_text(fb_ctx, font, x, y, memstr,
-				main_color, 1.5f);
+				main_color, TEXT_SCALE);
 	fbmagic_stroke(fb_ctx, x, y + 20, 280, 7, 1, main_color);
 	fbmagic_fill(fb_ctx, x, y + 20, val, 7,
 			main_color);
@@ -88,7 +90,7 @@ static size_t draw_memory(comp_data* data, size_t x, size_t y, uint32_t main_col
 
 	val = total_swap_mb == 0 ? 0 : (size_t)(((float)used_swap_mb / total_swap_mb) * 280);
 	fbmagic_draw_text(fb_ctx, font, x, y, swapstr,
-				main_color, 1.5f);
+				main_color, TEXT_SCALE);
 	fbmagic_stroke(fb_ctx, x, y + 20, 280, 7, 1, main_color);
 	fbmagic_fill(fb_ctx, x, y + 20, val, 7,
 			main_color);
@@ -109,11 +111,11 @@ size_t draw_thermal(comp_data* data, size_t x, size_t y, uint32_t main_color) {
 	sprintf(gpu_label, "GPU Temp: %.1lfC", gpu_c);
 
 	fbmagic_draw_text(fb_ctx, font, x, y, cpu_label,
-			main_color, 1.5f);
+			main_color, TEXT_SCALE);
 	x += 150;
 
 	fbmagic_draw_text(fb_ctx, font, x, y, gpu_label,
-			main_color, 1.5f);
+			main_color, TEXT_SCALE);
 	
 	return y + 32;
 }
