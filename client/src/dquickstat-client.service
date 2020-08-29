@@ -1,0 +1,15 @@
+[Unit]
+Description=dquickstat client
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/usr/local/bin/dquickstat-client 192.168.1.69
+User=dquickstat
+Group=dquickstat
+
+[Install]
+WantedBy=multi-user.target

@@ -2,7 +2,6 @@
 #include "log.h"
 #include <stdio.h>
 #include <string.h>
-#include <sys/sysinfo.h>
 
 unsigned long long last_cpu_info[8][2];
 
@@ -62,16 +61,65 @@ int query_cpu(comp_data* data) {
 }
 
 int query_mem(comp_data* data) {
-	struct sysinfo info;
+	char cmd[64];
+	unsigned long long value;
+	unsigned long long totalram, availram, totalswap, freeswap;
+	FILE* info_file = fopen("/proc/meminfo", "r");
 
-	if (sysinfo(&info)) {
+	if (info_file == 0) {
 		dlog(LOG_ERROR, "Failed to query sysinfo");
 		return 1;
 	}
+
+	totalram = availram = totalswap = freeswap = 0;
+
+	while (fscanf(info_file, "%s %llu kB\n", cmd, &value) == 2) {
+		if (totalram && availram && totalswap && freeswap)
+			break;
+
+		if (!totalram && strcmp(cmd, "MemTotal:") == 0) {
+			totalram = value * 1024;
+		}
+		if (!availram && strcmp(cmd, "MemAvailable:") == 0) {
+			availram = value * 1024;
+		}
+		if (!totalswap && strcmp(cmd, "SwapTotal:") == 0) {
+			totalswap = value * 1024;
+		}
+		if (!freeswap && strcmp(cmd, "SwapFree:") == 0) {
+			freeswap = value * 1024;
+		}
+	}
 	
-	data->numrows[ID_TOTALMEM] = info.totalram;
-	data->numrows[ID_USEDMEM] = info.totalram - info.freeram - info.bufferram;
-	data->numrows[ID_TOTALSWAP] = info.totalswap;
-	data->numrows[ID_USEDSWAP] = info.totalswap - info.freeswap;
+	data->numrows[ID_TOTALMEM] = totalram;
+	data->numrows[ID_USEDMEM] = totalram - availram;
+	data->numrows[ID_TOTALSWAP] = totalswap;
+	data->numrows[ID_USEDSWAP] = totalswap - freeswap;
+
+	fclose(info_file);
+	return 0;
+}
+
+int query_thermal(comp_data* data) {
+	FILE* fd;
+	unsigned long temp;
+
+	fd = fopen("/sys/class/thermal/thermal_zone0/temp", "r");
+	if (fd == 0) return 1;
+
+	if (fscanf(fd, "%lu", &temp) == 1) {
+		data->numrows[ID_CPUTEMP] = temp;
+	}
+	fclose(fd);
+
+	/* Hardcoded assumption for gpu pci mapping */
+	fd = fopen("/sys/devices/pci0000:00/0000:00:01.0/0000:01:00.0/hwmon/hwmon1/temp1_input", "r");
+	if (fd == 0) return 2;
+
+	if (fscanf(fd, "%lu", &temp) == 1) {
+		data->numrows[ID_GPUTEMP] = temp;
+	}
+	fclose(fd);
+
 	return 0;
 }

@@ -25,12 +25,14 @@ int main(int argc, const char** argv) {
 		if (query_cpu(&cdata) || query_mem(&cdata)) {
 			return 4;
 		}
+		/* Ignore errors for reading thermals */
+		query_thermal(&cdata);
 
 		if (send_data(&cdata)) {
 			return 3;
 		}
 
-		usleep(600 * 1000);
+		usleep(1100 * 1000);
 	}
 
 	close_net();
