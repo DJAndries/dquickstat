@@ -1,0 +1,12 @@
+[Unit]
+Description=dquickstat server prep
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+ExecStart=/bin/sh -c "/bin/chmod 766 /sys/class/backlight/*/bl_power"
+
+[Install]
+WantedBy=multi-user.target

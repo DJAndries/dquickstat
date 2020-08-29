@@ -22,3 +22,17 @@ bin:
 
 clean:
 	rm -f obj/* bin/*
+
+install: bin/dquickstat-server
+	useradd -G video -M -s /usr/bin/nologin dquickstat || true
+	usermod -L dquickstat
+	install -m 755 -d /usr/local/share/dquickstat/res
+	install -m 644 ./res/* /usr/local/share/dquickstat/res/
+	install -m 644 ./bin/libfbmagic.so /usr/lib/
+	install -m 755 ./bin/dquickstat-server /usr/local/bin/
+	install -m 644 ./src/dquickstat-server-prep.service /etc/systemd/system
+	install -m 644 ./src/dquickstat-server.service /etc/systemd/system
+	systemctl enable dquickstat-server-prep
+	systemctl start dquickstat-server-prep
+	systemctl enable dquickstat-server
+	systemctl start dquickstat-server

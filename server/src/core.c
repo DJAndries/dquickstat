@@ -3,10 +3,12 @@
 #include "fb.h"
 #include "net.h"
 #include "comp_data.h"
+#include "backlight.h"
 
 int main(int argc, const char** argv) {
 	const char def_device[] = "/dev/fb1";
 	comp_data cdata;
+	int data_result;
 
 	if (init_fb(argc > 1 ? argv[1] : def_device)) {
 		return 1;
@@ -15,12 +17,21 @@ int main(int argc, const char** argv) {
 		return 2;
 	}
 
+	switch_backlight("1");
+
 	while (1) {
-		if (net_get_data(&cdata) == 0) {
-			draw_frame(&cdata);
+		data_result = net_get_data(&cdata);
+		switch(data_result) {
+			case NET_CONN_CLOSE:
+				switch_backlight("1");
+				break;
+			case NET_MSG:
+				draw_frame(&cdata);
+			case NET_NEW_CONN:
+				switch_backlight("0");
 		}
 
-		usleep(500 * 1000);
+		usleep(1000 * 1000);
 	}
 
 	free_fb();

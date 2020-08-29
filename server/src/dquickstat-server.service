@@ -1,0 +1,16 @@
+[Unit]
+Description=dquickstat server
+After=network-online.target dquickstat-server-prep.service
+Wants=network-online.target dquickstat-server-prep.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+Environment="RESOURCE_PATH_PREFIX=/usr/local/share/dquickstat/"
+ExecStart=/usr/local/bin/dquickstat-server
+User=dquickstat
+Group=dquickstat
+
+[Install]
+WantedBy=multi-user.target
