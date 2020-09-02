@@ -121,9 +121,15 @@ size_t draw_thermal(comp_data* data, size_t x, size_t y, uint32_t main_color) {
 }
 
 void draw_frame(comp_data* data) {
+	int lock_fd;
 	size_t x, y;
 	uint32_t main_color = fbmagic_color_value(fb_ctx, 0x0, 0x02, 0x59);
 	uint32_t disabled_color = fbmagic_color_value(fb_ctx, 0x90, 0x90, 0x90);
+
+	if ((lock_fd = fbmagic_lock_acquire(0)) == 0) {
+		return;
+	}
+
 	fbmagic_draw_image_quick(fb_ctx, 0, 0, bg);
 
 	x = 20;
@@ -134,4 +140,5 @@ void draw_frame(comp_data* data) {
 	y = draw_thermal(data, x, y + 8, main_color);
 
 	fbmagic_flush(fb_ctx);
+	fbmagic_lock_release(lock_fd);
 }
